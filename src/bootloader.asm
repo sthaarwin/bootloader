@@ -6,50 +6,50 @@ mov ah, 0x00
 mov al, 0x03  ; Set text mode 80x25, clears screen
 int 0x10
 
-; Step 1: Calculate the length of the string
-mov si, hello  ; Point to the string
-xor cx, cx     ; CX = 0 (counter)
+; Calculate the length of the string
+mov si, hello
+xor cx, cx
 count_loop:
-    mov al, [si]     ; Load character
-    cmp al, 0        ; Check if null terminator
+    mov al, [si]
+    cmp al, 0
     je done_count
-    inc si           ; Move to next character
-    inc cx           ; Increment length count
+    inc si
+    inc cx
     jmp count_loop
 done_count:
 
-; Step 2: Compute center column (80 - length) / 2
-mov ax, 80     ; Screen width
-sub ax, cx     ; 80 - length of string
-shr ax, 1      ; Divide by 2
-mov dl, al     ; Store center column in DL
+; Compute center column (80 - length) / 2
+mov ax, 80
+sub ax, cx
+shr ax, 1
+mov dl, al
 
-; Step 3: Set the cursor position
+; Set the cursor position
 mov ah, 0x02
-mov bh, 0x00   ; Page number
+mov bh, 0x00
 mov dh, 12     ; Row (fixed)
 int 0x10
 
-; Step 4: Print the string in red
-mov si, hello  ; Reset SI to point to the string
+; Print the string in red
+mov si, hello
 mov bl, 0x0C   ; Light Red text color
-mov bh, 0x00   ; Page number
+mov bh, 0x00
 
 print:
-    mov al, [si]     ; Load character
-    cmp al, 0        ; Check if null terminator
+    mov al, [si]
+    cmp al, 0
     je done_print
 
-    mov ah, 0x0E     ; BIOS teletype mode
+    mov ah, 0x0E
     int 0x10
 
-    inc si           ; Move to next character
+    inc si
     jmp print
 
 done_print:
 ; Wait for key press
 mov ah, 0x00
-int 0x16  ; BIOS keyboard input
+int 0x16
 
 jmp $
 
