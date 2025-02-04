@@ -32,9 +32,9 @@ load_kernel:
     call print16
     call print16_nl
 
-    mov  bx, KERNEL_OFFSET
-    mov  dh, 2
-    mov  dl, [BOOT_DRIVE]
+    mov  bx, KERNEL_OFFSET  ; Set-up parameters for disk_load routine
+    mov  dh, 15            ; Load 15 sectors (increase if your kernel is bigger)
+    mov  dl, [BOOT_DRIVE]  ; Use boot drive number saved earlier
     call disk_load
     ret
 
@@ -54,3 +54,4 @@ MSG_LOAD_KERNEL db "Loading kernel...", 0
 
  ;padding and magic number
 times 510-($-$$) db 0
+dw 0xaa55
