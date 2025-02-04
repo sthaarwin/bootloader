@@ -1,8 +1,8 @@
 [bits 32]
 global _start
-extern _kernel_main    ; Note the underscore prefix
+extern _kernel_main    ; Remove ALL underscores
 
 section .text
 _start:
-    call _kernel_main  ; Call with underscore prefix
+    call _kernel_main  ; Remove ALL underscores
     jmp $

@@ -55,33 +55,30 @@ void set_char_at_video_memory(char character, int offset)
 
 int scroll_ln(int cursor_offset)
 {
+    // Copy lines up
     memory_copy((char *)(VIDEO_ADDRESS + 2 * MAX_COLS),
                 (char *)VIDEO_ADDRESS,
                 MAX_COLS * (MAX_ROWS - 1) * 2);
+
+    // Clear the last line
+    int last_line = get_offset(0, MAX_ROWS - 1);
+    for (int i = 0; i < MAX_COLS * 2; i += 2) {
+        set_char_at_video_memory(' ', last_line + i);
+    }
+
+    // Return the offset at the start of the last line
+    return last_line;
 }
 
 void print_string(char *string)
 {
-    int offset = get_cursor();
+    char* video_memory = (char*)VIDEO_ADDRESS;
     int i = 0;
-    while (string[i] != 0)
-    {
-        if (offset >= MAX_ROWS * MAX_COLS * 2)
-        {
-            offset = scroll_ln(offset);
-        }
-        if (string[i] == '\n')
-        {
-            offset = move_offset_to_new_line(offset);
-        }
-        else
-        {
-            set_char_at_video_memory(string[i], offset);
-            offset += 2;
-        }
+    while(string[i] != 0) {
+        video_memory[i*2] = string[i];
+        video_memory[i*2 + 1] = WHITE_ON_BLACK;
         i++;
     }
-    set_cursor(offset);
 }
 
 void print_nl()
@@ -97,13 +94,13 @@ void print_nl()
 void clear_screen()
 {
     int screen_size = MAX_COLS * MAX_ROWS;
-    int i;
-    for(i = 0; i < screen_size; i++)
+    for(int i = 0; i < screen_size; i++)
     {
-        set_char_at_video_memory(' ', i * 2);
-
+        char* video_memory = (char*)VIDEO_ADDRESS;
+        video_memory[i * 2] = ' ';
+        video_memory[i * 2 + 1] = WHITE_ON_BLACK;
     }
-    set_cursor(get_offset(0, 0));
+    set_cursor(0);
 }
 
 #endif

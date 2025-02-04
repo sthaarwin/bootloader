@@ -1,13 +1,16 @@
 #include "util.h"
 #include "../drivers/display.h"
 
-void kernel_main(void)
+void kernel_main(void) 
 {
-    clear_screen();
-    char line[20];
-    for (int i = 1; i <= 35; ++i) {
-        int_to_string(i, line, 50);
-        print_string(line);
-        print_nl();  
+    // Direct write to video memory first
+    char* video_memory = (char*)0xb8000;
+    for(int i = 0; i < 10; i++) {
+        video_memory[i*2] = 'X';
+        video_memory[i*2 + 1] = 0x0f;
     }
+
+    // Then try the display functions
+    clear_screen();
+    print_string("Hello world!");
 }

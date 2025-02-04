@@ -13,7 +13,7 @@ bin/kernel-entry.o: boot/kernel-entry.asm
 	nasm $< -f elf -o $@
 
 bin/kernel.o: kernel/kernel.c
-	gcc -m32 -fno-builtin -fno-stack-protector -nostdlib -nostdinc -c $< -o $@ -ffreestanding -fno-pie -fno-asynchronous-unwind-tables
+	gcc -m32 -fno-builtin -fno-stack-protector -nostdlib -nostdinc -c $< -o $@ -ffreestanding -fno-pie -fno-asynchronous-unwind-tables -mno-red-zone -fno-exceptions
 
 bin/bootloader.bin: boot/bootloader.asm
 	nasm $< -f bin -o $@
