@@ -1,5 +1,10 @@
+#include <stdint.h>
 #include "util.h"
 #include "../drivers/display.h"
+#include "../drivers/keyboard.h"
+#include "../cpu/isr.h"
+#include "../cpu/idt.h"
+#include "../cpu/timer.h"
 
 void display_logo()
 {
@@ -47,4 +52,16 @@ void kernel_main(void)
 {
     clear_screen();
     display_logo();
+
+    // print_string("Installling Interrupt serivce routines(ISR)...");
+    // isr_install();
+    // print_nl();
+
+    // print_string("Enabling eternal interrupts...");
+    // asm volatile("sti");
+    // print_nl();
+
+    // print_string("Initializing keyboard (IRQ 1)");
+    // init_keyboard();
+    // print_nl();
 }

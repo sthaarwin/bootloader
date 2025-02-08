@@ -17,30 +17,30 @@ disk_load:
 
     ; [es:bx] <- pointer to buffer where the data will be stored
     ; caller sets it up for us, and it is actually the standard location for int 13h
-    int 0x13      ; BIOS interrupt
-    jc disk_error ; if error (stored in the carry bit)
+    int 0x13       ; BIOS interrupt
+    jc  disk_error ; if error (stored in the carry bit)
 
     pop dx
-    cmp al, dh    ; BIOS also sets 'al' to the # of sectors read. Compare it.
+    cmp al, dh        ; BIOS also sets 'al' to the # of sectors read. Compare it.
     jne sectors_error
     popa
     ret
 
 
 disk_error:
-    mov bx, DISK_ERROR
+    mov  bx, DISK_ERROR
     call print16
     call print16_nl
-    mov dh, ah ; ah = error code, dl = disk drive that dropped the error
-    call print16_hex ; check out the code at http://stanislavs.org/helppc/int_13-1.html
-    jmp disk_loop
+    mov  dh, ah         ; ah = error code, dl = disk drive that dropped the error
+    call print16_hex    ; check out the code at http://stanislavs.org/helppc/int_13-1.html
+    jmp  disk_loop
 
 sectors_error:
-    mov bx, SECTORS_ERROR
+    mov  bx, SECTORS_ERROR
     call print16
 
 disk_loop:
     jmp $
 
-DISK_ERROR: db "Disk read error", 0
+DISK_ERROR:    db "Disk read error", 0
 SECTORS_ERROR: db "Incorrect number of sectors read", 0
