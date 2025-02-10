@@ -53,15 +53,15 @@ void kernel_main(void)
     clear_screen();
     display_logo();
 
-    // print_string("Installling Interrupt serivce routines(ISR)...");
-    // isr_install();
-    // print_nl();
+    print_string("Installling Interrupt serivce routines(ISR)...");
+    isr_install();
+    print_nl();
 
-    // print_string("Enabling eternal interrupts...");
-    // asm volatile("sti");
-    // print_nl();
+    print_string("Enabling eternal interrupts...");
+    asm volatile("sti");
+    print_nl();
 
-    // print_string("Initializing keyboard (IRQ 1)");
-    // init_keyboard();
-    // print_nl();
+    print_string("Initializing keyboard (IRQ 1)");
+    init_keyboard();
+    print_nl();
 }

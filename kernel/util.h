@@ -4,52 +4,12 @@
 #define low_16(address) (uint16_t)((address)&0xFFFF)
 #define high_16(address) (uint16_t)(((address) >> 16) & 0xFFFF)
 
+#ifndef UTIL_H
+#define UTIL_H
 
-void memory_copy(char *source, char *dest, int nbytes)
-{
-    int i;
-    for (i = 0; i < nbytes; i++)
-    {
-        *(dest + i) = *(source + i);
-    }
-}
+void memory_copy(char *source, char *dest, int nbytes);
+int string_length(char s[]);
+void reverse(char s[]);
+char *int_to_string(int v, char *buffer, int radix_base);
 
-int string_length(char s[])
-{
-    int i = 0;
-    while (s[i] != '\0')
-    {
-        i++;
-    }
-    return i;
-}
-
-void reverse(char s[])
-{
-    int c, i, j;
-    for (i = 0, j = string_length(s) - 1; i < j; i++, j--)
-    {
-        c = s[i];
-        s[i] = s[j];
-        s[j] = c;
-    }
-}
-
-char *int_to_string(int v, char *buffer, int radix_base)
-{
-    static char table[] = "0123456789abcdefghijklmnopqrstuvwxyz";
-    char *p = buffer;
-    unsigned int n = (v < 0 && radix_base == 10) ? -v : (unsigned int)v;
-
-    while (n >= radix_base)
-    {
-        *p++ = table[n % radix_base];
-        n /= radix_base;
-    }
-    *p++ = table[n];
-    if (v < 0 && radix_base == 10)
-        *p++ = '-';
-
-    *p = '\0';
-    return buffer;
-}
+#endif

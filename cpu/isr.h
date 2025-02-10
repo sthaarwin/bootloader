@@ -1,10 +1,7 @@
 #ifndef ISR_H
 #define ISR_H
 #include <stdint.h>
-#include "idt.h"
-#include "../drivers/display.h"
-#include "../drivers/ports.h"
-#include "../kernel/util.h"
+
 typedef struct
 {
     uint32_t ds;
@@ -15,9 +12,10 @@ typedef struct
 
 typedef void (*isr_t)(registers_t *r);
 void isr_install();
-void isr_handler(registers_t r);
+void isr_handler(registers_t *r);
 void register_interrupt_handler(uint8_t n, isr_t handler);
-isr_t interrupt_handlers[256];
+extern isr_t interrupt_handlers[256];
+extern char *exception_messages[];
 
 extern void isr0();
 extern void isr1();
@@ -85,40 +83,5 @@ extern void irq15();
 #define IRQ13 45
 #define IRQ14 46
 #define IRQ15 47
-
-void isr_install();
-void isr_handler(registers_t r);
-char *exception_messages[] = {
-    "Division By Zero",
-    "Debug",
-    "Non Maskable Interrupt",
-    "Breakpoint",
-    "Into Detected Overflow",
-    "Out of Bounds",
-    "Invalid Opcode",
-    "No Coprocessor",
-    "Double Fault",
-    "Coprocessor Segment Overrun",
-    "Bad TSS",
-    "Segment Not Present",
-    "Stack Fault",
-    "General Protection Fault",
-    "Page Fault",
-    "Unknown Interrupt",
-    "Coprocessor Fault",
-    "Alignment Check",
-    "Machine Check",
-    "Reserved",
-    "Reserved",
-    "Reserved",
-    "Reserved",
-    "Reserved",
-    "Reserved",
-    "Reserved",
-    "Reserved",
-    "Reserved",
-    "Reserved",
-    "Reserved"
-};
 
 #endif

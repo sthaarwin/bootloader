@@ -1,6 +1,12 @@
 #include "timer.h"
+#include "isr.h"
+#include "idt.h"
+#include "../drivers/ports.h"
+#include "../drivers/display.h"
+#include "../kernel/util.h"
+uint32_t tick = 0;
 
-static void timer_callback(registers_t *regs)
+void timer_callback(registers_t *regs)
 {
     tick++;
     print_string("Tick: ");
