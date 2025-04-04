@@ -131,3 +131,11 @@ void print_string_centered_color(char *string, char color_attr) {
     }
     print_string_color(string, color_attr);
 }
+
+void backspace(int offset) {
+    int newOffset = offset - 2;
+    if (newOffset >= 0) {
+        set_char_at_video_memory(' ', newOffset);
+        set_cursor(newOffset);
+    }
+}

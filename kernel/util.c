@@ -48,3 +48,11 @@ char *int_to_string(int v, char *buffer, int radix_base)
     *p = '\0';
     return buffer;
 }
+
+int strcmp(const char *s1, const char *s2) {
+    while (*s1 && *s1 == *s2) {
+        s1++;
+        s2++;
+    }
+    return *s1 - *s2;
+}

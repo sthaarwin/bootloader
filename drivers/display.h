@@ -49,5 +49,6 @@ extern int get_padding(int string_length);
 extern void print_string_centered(char *string);
 extern void print_string_color(char *string, char color_attr);
 extern void print_string_centered_color(char *string, char color_attr);
+extern void backspace(int offset);
 
 #endif

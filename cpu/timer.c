@@ -9,11 +9,14 @@ uint32_t tick = 0;
 void timer_callback(registers_t *regs)
 {
     tick++;
+    // Remove or comment out the printing code
+    /*
     print_string("Tick: ");
     char tick_ascii[256];
     int_to_string(tick, tick_ascii, 10);
     print_string(tick_ascii);
     print_nl();
+    */
 }
 
 void init_timer(uint32_t freq)

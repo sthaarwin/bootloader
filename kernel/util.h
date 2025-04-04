@@ -11,5 +11,6 @@ void memory_copy(char *source, char *dest, int nbytes);
 int string_length(char s[]);
 void reverse(char s[]);
 char *int_to_string(int v, char *buffer, int radix_base);
+int strcmp(const char *s1, const char *s2);
 
 #endif
