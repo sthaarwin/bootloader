@@ -1,4 +1,4 @@
-#include <stdint.h>
+#include "../cpu/stdint.h"
 #pragma once
 
 #define low_16(address) (uint16_t)((address)&0xFFFF)

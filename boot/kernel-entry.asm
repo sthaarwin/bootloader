@@ -1,8 +1,8 @@
 [bits 32]
-global  _start
-extern  _kernel_main ; Remove ALL underscores
+global _start
+extern kernel_main
 
 section .text
 _start:
-    call _kernel_main ; Remove ALL underscores
-    jmp  $
+    call kernel_main
+    jmp $

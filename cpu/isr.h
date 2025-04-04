@@ -1,6 +1,6 @@
 #ifndef ISR_H
 #define ISR_H
-#include <stdint.h>
+#include "stdint.h"
 
 typedef struct
 {

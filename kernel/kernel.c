@@ -1,4 +1,4 @@
-#include <stdint.h>
+#include "../cpu/stdint.h"
 #include "util.h"
 #include "../drivers/display.h"
 #include "../drivers/keyboard.h"

@@ -5,12 +5,18 @@
 # First rule is the one executed when no parameters are fed to the Makefile
 all: run
 
-# Include paths
-INCLUDE_PATH = C:/msys64/ucrt64/include
+# Detect OS and set format
+ifeq ($(OS),Windows_NT)
+    INCLUDE_PATH = C:/msys64/ucrt64/include
+    LD_FORMAT = i386pe
+else
+    INCLUDE_PATH = /usr/include
+    LD_FORMAT = elf_i386
+endif
 
 # Common compiler flags
 C_FLAGS = -m32 -fno-builtin -fno-stack-protector -nostdlib -nostdinc \
-          -I $(INCLUDE_PATH) -ffreestanding -fno-pie \
+          -I$(CURDIR) -ffreestanding -fno-pie \
           -fno-asynchronous-unwind-tables -mno-red-zone -fno-exceptions
 
 # Source files
@@ -22,15 +28,23 @@ OBJ_FILES = bin/kernel-entry.o \
             $(patsubst %.c,bin/%.o,$(notdir $(C_SOURCES)))
 
 # Final binary
-bin/kernel.bin: $(OBJ_FILES)
-	ld -m i386pe -Ttext 0x1000 -e _start -o bin/kernel.elf $^
-	objcopy -O binary bin/kernel.elf $@
+bin/kernel.bin: bin/kernel.elf
+	objcopy -O binary $< $@
 
-# Compile assembly files
+bin/kernel.elf: bin/kernel-entry.o bin/kernel.o bin/util.o bin/display.o bin/ports.o bin/idt.o bin/isr.o bin/timer.o bin/irq.o bin/isr_asm.o
+	ld -m $(LD_FORMAT) -Ttext 0x1000 -e _start -o $@ $^
+
+# Assembly files
 bin/kernel-entry.o: boot/kernel-entry.asm
 	nasm $< -f elf -o $@
 
-# Pattern rule for C files
+bin/irq.o: cpu/irq.asm
+	nasm $< -f elf -o $@
+
+bin/isr_asm.o: cpu/isr.asm
+	nasm -f elf $< -o $@
+
+# Pattern rules for C files
 bin/%.o: kernel/%.c ${HEADERS}
 	gcc ${C_FLAGS} -c $< -o $@
 
@@ -39,24 +53,6 @@ bin/%.o: drivers/%.c ${HEADERS}
 
 bin/%.o: cpu/%.c ${HEADERS}
 	gcc ${C_FLAGS} -c $< -o $@
-
-bin/isr.o: cpu/isr.c
-	gcc -m32 -c cpu/isr.c -o bin/isr.o
-
-bin/irq.o: cpu/irq.asm
-	nasm -f elf cpu/irq.asm -o bin/irq.o
-
-bin/irq.o: cpu/interrupt.asm
-	nasm -f elf cpu/interrupt.asm -o bin/irq.o
-
-bin/isr_asm.o: cpu/isr.asm
-	nasm -f elf cpu/isr.asm -o bin/isr_asm.o
-
-bin/isr_asm.o: cpu/interrupt.asm
-	nasm -f elf cpu/interrupt.asm -o bin/isr_asm.o
-
-bin/kernel.elf: bin/kernel-entry.o bin/kernel.o bin/util.o bin/display.o bin/ports.o bin/idt.o bin/isr.o bin/timer.o bin/irq.o bin/isr_asm.o
-	ld -m i386pe -Ttext 0x1000 -e _start -o bin/kernel.elf $^
 
 # Bootloader
 bin/bootloader.bin: boot/bootloader.asm
