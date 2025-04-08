@@ -7,6 +7,7 @@
 #include "../cpu/timer.h"
 #include "../drivers/ports.h"
 #include "../shell/shell.h"
+#include "kernel.h"
 
 void display_logo()
 {
@@ -50,40 +51,14 @@ void display_logo()
     print_nl();
 }
 
-void delay(uint32_t count) {
-    for(uint32_t i = 0; i < count; i++) {
-        asm volatile("nop");
-    }
-}
-
-void kernel_main(void)
-{
-    clear_screen();
-    display_logo();
-
-    print_string("Installing Interrupt service routines(ISR)...");
+void kernel_main() {
+    init_display();
     isr_install();
-    print_nl();
-
-    print_string("Enabling eternal interrupts...");
-    asm volatile("sti");
-    print_nl();
-
-    print_string("Initializing keyboard (IRQ 1)");
-    init_keyboard();
-    print_nl();
-
-    init_timer(100);
-
-    delay(30000000); 
-    
-    clear_screen(); 
-    print_string_centered_color("System Ready", MAKE_COLOR(LIGHT_GREEN, BLACK));
-    print_nl();
-    
+    irq_install();
+    display_logo();
     shell_init();
-    while (1)
-    {
+    
+    while(1) {
         asm volatile("hlt");
     }
 }

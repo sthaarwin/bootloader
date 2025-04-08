@@ -35,6 +35,7 @@
 #define REG_SCREEN_DATA 0x3d5
 
 // Function declarations
+extern void init_display(void);
 extern void set_cursor(int offset);
 extern int get_cursor();
 extern int get_offset(int col, int row);

@@ -21,7 +21,7 @@ C_FLAGS = -m32 -fno-builtin -fno-stack-protector -nostdlib -nostdinc \
 
 # Source files
 C_SOURCES = $(wildcard kernel/*.c drivers/*.c cpu/*.c shell/*.c)
-HEADERS = $(wildcard kernel/*.h drivers/*.h cpu/*.h)
+HEADERS = $(wildcard kernel/*.h drivers/*.h cpu/*.h shell/*.h)
 
 # Object files
 OBJ_FILES = bin/kernel-entry.o \
@@ -31,7 +31,7 @@ OBJ_FILES = bin/kernel-entry.o \
 bin/kernel.bin: bin/kernel.elf
 	objcopy -O binary $< $@
 
-bin/kernel.elf: bin/kernel-entry.o bin/kernel.o bin/util.o bin/display.o bin/ports.o bin/idt.o bin/isr.o bin/timer.o bin/irq.o bin/isr_asm.o bin/shell.o bin/keyboard.o
+bin/kernel.elf: bin/kernel-entry.o bin/kernel.o bin/util.o bin/display.o bin/ports.o bin/idt.o bin/isr.o bin/timer.o bin/irq.o bin/isr_asm.o bin/shell.o bin/keyboard.o bin/shell_commands.o
 	ld -m $(LD_FORMAT) -Ttext 0x1000 -e _start -o $@ $^
 
 # Assembly files
@@ -54,7 +54,6 @@ bin/%.o: drivers/%.c ${HEADERS}
 bin/%.o: cpu/%.c ${HEADERS}
 	gcc ${C_FLAGS} -c $< -o $@
 
-# Add pattern rule for shell files
 bin/%.o: shell/%.c ${HEADERS}
 	gcc ${C_FLAGS} -c $< -o $@
 
@@ -72,10 +71,11 @@ run: bin/os-image.bin
 
 # Make directories if they don't exist
 directories:
+	mkdir -p bin
 
 # Clean up
 clean:
-	$(RM) bin/*.bin bin/*.o bin/*.elf bin/*.dis
+	$(RM) -r bin
 
 # Debug rule to print variables
 print-%:

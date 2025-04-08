@@ -2,6 +2,11 @@
 #include "../kernel/util.h"
 #include "display.h"
 
+void init_display(void) {
+    clear_screen();
+    set_cursor(get_offset(0, 0));
+}
+
 void set_cursor(int offset) {
     offset /= 2;
     port_byte_out(REG_SCREEN_CTRL, 14);

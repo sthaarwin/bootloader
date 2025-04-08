@@ -184,24 +184,55 @@ void handle_special_key(uint8_t scancode) {
 }
 
 static void keyboard_callback(registers_t *regs) {
-    uint8_t scancode = port_byte_in(0x60);
+    uint8_t status = port_byte_in(0x64);
+    if (status & 1) {  // Output buffer full
+        uint8_t scancode = port_byte_in(0x60);
+        
+        if (scancode == EXTENDED_KEY) {
+            extended_scancode = 1;
+            return;
+        }
 
-    if (scancode == EXTENDED_KEY) {
-        extended_scancode = 1;
-        return;
-    }
+        handle_special_key(scancode);
 
-    handle_special_key(scancode);
-
-    // Only handle key press events, not releases
-    if (!(scancode & KEY_RELEASED)) {
-        char key = scancode_to_ascii(scancode);
-        if (key) {
-            shell_handle_input(key);
+        // Only handle key press events, not releases
+        if (!(scancode & KEY_RELEASED)) {
+            char key = scancode_to_ascii(scancode);
+            if (key) {
+                shell_handle_input(key);
+            }
         }
     }
 }
 
-void init_keyboard(void) {
+void init_keyboard() {
+    // Disable keyboard during initialization
+    port_byte_out(0x64, 0xAD);
+
+    // Flush the output buffer
+    while (port_byte_in(0x64) & 1) {
+        port_byte_in(0x60);
+    }
+
+    // Set command byte
+    port_byte_out(0x64, 0x60);
+    // Wait for controller
+    while (port_byte_in(0x64) & 2) {}
+    // Set configuration: enable IRQ1 and translation
+    port_byte_out(0x60, 0x45);
+
+    // Enable keyboard
+    port_byte_out(0x64, 0xAE);
+
+    // Reset keyboard
+    port_byte_out(0x60, 0xFF);
+    while((port_byte_in(0x64) & 1) == 0) {} // Wait for response
+    if(port_byte_in(0x60) != 0xFA) {
+        // Reset failed, try again
+        for(int i = 0; i < 100000; i++) { asm volatile("nop"); }
+        port_byte_out(0x60, 0xFF);
+    }
+
+    // Register interrupt handler
     register_interrupt_handler(IRQ1, keyboard_callback);
 }

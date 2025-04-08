@@ -1,4 +1,5 @@
 #include "shell.h"
+#include "shell_commands.h"
 #include "../drivers/display.h"
 #include "../drivers/keyboard.h"
 #include "../cpu/timer.h"
@@ -25,14 +26,16 @@ void shell_handle_input(char key)
         command_length = 0;
         print_string("> ");
     }
+    
     else if (key == '\b')
     {
         if (command_length > 0)
         {
             command_length--;
-            backspace(get_cursor());  // Use new backspace function
+            backspace(get_cursor()); 
         }
     }
+    
     else if (command_length < MAX_COMMAND_LENGTH - 1)
     {
         command_buffer[command_length++] = key;
@@ -48,23 +51,19 @@ void shell_process_command(char *command)
 
     if (strcmp(command, "help") == 0)
     {
-        print_string("Available commands:");
-        print_nl();
-        print_string("  help     - Show this help message");
-        print_nl();
-        print_string("  clear    - Clear the screen");
-        print_nl();
-        print_string("  version  - Show OS version");
-        print_nl();
+        cmd_help();
     }
     else if (strcmp(command, "clear") == 0)
     {
-        clear_screen();
+        cmd_clear();
     }
     else if (strcmp(command, "version") == 0)
     {
-        print_string("AxOS v0.1");
-        print_nl();
+        cmd_version();
+    }
+    else if(strcmp(command, "reboot") == 0)
+    {
+        cmd_reboot();
     }
     else
     {
