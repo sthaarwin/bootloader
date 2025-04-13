@@ -17,6 +17,10 @@ void cmd_help(void) {
     print_nl();
     print_string("  reboot   - Restart the system");
     print_nl();
+    print_string("  echo     - Display text");
+    print_nl();
+    print_string("  shutdown - Power off the system");
+    print_nl();
 }
 
 void cmd_clear(void) {
@@ -58,4 +62,34 @@ void cmd_reboot(void) {
         "int $0x3    \n"
     );
     asm volatile("hlt");
+}
+
+void cmd_echo(char *args) {
+    if (args && *args) {
+        print_string(args);
+        print_nl();
+    } else {
+        print_nl();
+    }
+}
+
+void cmd_shutdown(void) {
+    print_string("Shutting down system...");
+    print_nl();
+    
+    for(int i = 0; i < 10000; i++) {
+        asm volatile("nop");
+    }
+    
+    // Try ACPI shutdown - This works in QEMU and some real hardware
+    port_word_out(0x604, 0x2000);  // Changed to port_word_out for correct value
+    
+    // If that didn't work, try another method
+    port_byte_out(0x64, 0xFE);     // Reset CPU using keyboard controller
+    
+    // If still running, halt the CPU
+    print_string("Failed to shut down. System halted.");
+    print_nl();
+    asm volatile("cli");  // Disable interrupts
+    asm volatile("hlt");  // Halt the CPU
 }

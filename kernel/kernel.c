@@ -9,6 +9,13 @@
 #include "../shell/shell.h"
 #include "kernel.h"
 
+void delay(uint32_t count) {
+    volatile uint32_t i;
+    for (i = 0; i < count * 100000; i++) {
+        asm volatile("nop");
+    }
+}
+
 void display_logo()
 {
     char *logo[] = {
@@ -51,14 +58,20 @@ void display_logo()
     print_nl();
 }
 
-void kernel_main() {
+void kernel_main()
+{
     init_display();
     isr_install();
-    irq_install();
     display_logo();
-    shell_init();
     
-    while(1) {
+    delay(2);
+    
+    irq_install();
+    init_keyboard();
+    shell_init();
+
+    while (1)
+    {
         asm volatile("hlt");
     }
 }

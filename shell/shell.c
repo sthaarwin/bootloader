@@ -11,9 +11,15 @@ static int command_length = 0;
 
 void shell_init(void)
 {
+    for (int i = 0; i < MAX_COMMAND_LENGTH; i++) {
+        command_buffer[i] = 0;
+    }
+    command_length = 0;
+
     print_string("AxOS Shell v0.1");
     print_nl();
     print_string("> ");
+    set_cursor(get_cursor());
 }
 
 void shell_handle_input(char key)
@@ -44,10 +50,31 @@ void shell_handle_input(char key)
     }
 }
 
+int find_space(char *str) {
+    int i = 0;
+    while (str[i] != '\0') {
+        if (str[i] == ' ') {
+            return i;
+        }
+        i++;
+    }
+    return -1;  // No space found
+}
+
 void shell_process_command(char *command)
 {
     if (command[0] == '\0')
         return;
+
+    int space_pos = find_space(command);
+    char *args = 0;  // Using 0 instead of NULL
+    
+    if (space_pos != -1) {
+        // Null-terminate the command at the space
+        command[space_pos] = '\0';
+        // Point args to the character after the space
+        args = &command[space_pos + 1];
+    }
 
     if (strcmp(command, "help") == 0)
     {
@@ -64,6 +91,14 @@ void shell_process_command(char *command)
     else if(strcmp(command, "reboot") == 0)
     {
         cmd_reboot();
+    }
+    else if(strcmp(command, "echo") == 0)
+    {
+        cmd_echo(args);
+    }
+    else if(strcmp(command, "shutdown") == 0)
+    {
+        cmd_shutdown();
     }
     else
     {

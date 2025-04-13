@@ -125,6 +125,10 @@ char scancode_to_ascii(uint8_t scancode) {
     if (scancode == 0x0E) {
         return '\b';
     }
+    
+    if (scancode == 0x1C) {
+        return '\n';
+    }
 
     if (scancode >= sizeof(ascii_normal)) return 0;
     
@@ -135,16 +139,12 @@ void handle_special_key(uint8_t scancode) {
     if (extended_scancode) {
         switch (scancode) {
             case ARROW_UP:
-                // Handle up arrow
                 break;
             case ARROW_DOWN:
-                // Handle down arrow
                 break;
             case ARROW_LEFT:
-                // Handle left arrow
                 break;
             case ARROW_RIGHT:
-                // Handle right arrow
                 break;
             default:
                 break;
@@ -153,30 +153,29 @@ void handle_special_key(uint8_t scancode) {
         return;
     }
 
-    // Handle modifier keys
     if (!(scancode & KEY_RELEASED)) {
         switch (scancode) {
-            case 0x2A: // Left shift
-            case 0x36: // Right shift
+            case 0x2A:
+            case 0x36:
                 shift_pressed = 1;
                 break;
-            case 0x1D: // Left control
+            case 0x1D:
                 ctrl_pressed = 1;
                 break;
-            case 0x38: // Left alt
+            case 0x38:
                 alt_pressed = 1;
                 break;
         }
     } else {
         switch (scancode & ~KEY_RELEASED) {
-            case 0x2A: // Left shift
-            case 0x36: // Right shift
+            case 0x2A:
+            case 0x36:
                 shift_pressed = 0;
                 break;
-            case 0x1D: // Left control
+            case 0x1D:
                 ctrl_pressed = 0;
                 break;
-            case 0x38: // Left alt
+            case 0x38:
                 alt_pressed = 0;
                 break;
         }
@@ -184,55 +183,24 @@ void handle_special_key(uint8_t scancode) {
 }
 
 static void keyboard_callback(registers_t *regs) {
-    uint8_t status = port_byte_in(0x64);
-    if (status & 1) {  // Output buffer full
-        uint8_t scancode = port_byte_in(0x60);
-        
-        if (scancode == EXTENDED_KEY) {
-            extended_scancode = 1;
-            return;
-        }
+    uint8_t scancode = port_byte_in(0x60);
+    
+    if (scancode == EXTENDED_KEY) {
+        extended_scancode = 1;
+        return;
+    }
 
-        handle_special_key(scancode);
+    handle_special_key(scancode);
 
-        // Only handle key press events, not releases
-        if (!(scancode & KEY_RELEASED)) {
-            char key = scancode_to_ascii(scancode);
-            if (key) {
-                shell_handle_input(key);
-            }
+    if (!(scancode & KEY_RELEASED)) {
+        char key = scancode_to_ascii(scancode);
+        if (key) {
+            shell_handle_input(key);
         }
     }
 }
 
 void init_keyboard() {
-    // Disable keyboard during initialization
-    port_byte_out(0x64, 0xAD);
-
-    // Flush the output buffer
-    while (port_byte_in(0x64) & 1) {
-        port_byte_in(0x60);
-    }
-
-    // Set command byte
-    port_byte_out(0x64, 0x60);
-    // Wait for controller
-    while (port_byte_in(0x64) & 2) {}
-    // Set configuration: enable IRQ1 and translation
-    port_byte_out(0x60, 0x45);
-
-    // Enable keyboard
-    port_byte_out(0x64, 0xAE);
-
-    // Reset keyboard
-    port_byte_out(0x60, 0xFF);
-    while((port_byte_in(0x64) & 1) == 0) {} // Wait for response
-    if(port_byte_in(0x60) != 0xFA) {
-        // Reset failed, try again
-        for(int i = 0; i < 100000; i++) { asm volatile("nop"); }
-        port_byte_out(0x60, 0xFF);
-    }
-
-    // Register interrupt handler
+    port_byte_out(0x21, port_byte_in(0x21) & ~0x02);
     register_interrupt_handler(IRQ1, keyboard_callback);
 }
