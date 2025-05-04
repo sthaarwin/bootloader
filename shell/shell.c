@@ -58,7 +58,7 @@ int find_space(char *str) {
         }
         i++;
     }
-    return -1;  // No space found
+    return -1; 
 }
 
 void shell_process_command(char *command)

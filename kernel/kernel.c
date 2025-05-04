@@ -12,7 +12,7 @@
 void delay(uint32_t count) {
     volatile uint32_t i;
     for (i = 0; i < count * 100000; i++) {
-        asm volatile("nop");
+        asm("nop");
     }
 }
 
@@ -67,11 +67,10 @@ void kernel_main()
     delay(2);
     
     irq_install();
-    init_keyboard();
     shell_init();
 
     while (1)
     {
-        asm volatile("hlt");
+        asm("hlt");
     }
 }

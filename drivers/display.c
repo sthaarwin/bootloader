@@ -103,7 +103,6 @@ void print_string_centered(char *string) {
     print_string(string);
 }
 
-// New color functions
 void set_char_at_video_memory_color(char character, int offset, char color_attr) {
     char *video_memory = (char *)VIDEO_ADDRESS;
     video_memory[offset] = character;
